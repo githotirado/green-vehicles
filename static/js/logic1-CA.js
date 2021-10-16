@@ -1,12 +1,12 @@
 // Initialization function (put into its own .js)
-function init() {
-  let caVehicleFile = "static/data/vehicle-count-as-of-1-1-2020.csv"
-  const vehicleZip = d3.csv(caVehicleFile);
-  vehicleZip.then(function(myData) {
-    console.log(myData[0]);
-    console.log(myData);
-  });
-}
+// function init() {
+//   let caVehicleFile = "static/data/vehicle-count-as-of-1-1-2020.csv"
+//   const vehicleZip = d3.csv(caVehicleFile);
+//   vehicleZip.then(function(myData) {
+//     console.log(myData[0]);
+//     console.log(myData);
+//   });
+// }
 
 // Creating the map object
 var myMap = L.map("map", {
@@ -24,11 +24,9 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 }).addTo(myMap);
 
 // Use this link to get the GeoJSON data.
-// var link = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/15-Mapping-Web/nyc.geojson";
-// var link = "https://github.com/OpenDataDE/State-zip-code-GeoJSON/blob/4cc2657044efd08477465aed1912dca30198d441/ca_california_zip_codes_geo.min.json"
-// var link = "https://github.com/OpenDataDE/State-zip-code-GeoJSON/ca_california_zip_codes_geo.min.json"
-var link = "static/data/ca_california_zip_codes_geo.min.json"
-// Within the geoJSON file, the property for zip: "ZCTA5CE10":"94580"
+var link = "https://raw.githubusercontent.com/OpenDataDE/State-zip-code-GeoJSON/master/ca_california_zip_codes_geo.min.json"
+// var link = "static/data/ca_california_zip_codes_geo.min.json"
+// Within the geoJSON file, the property for zip: "ZCTA5CE10":"94601"
 
 // {"type":"FeatureCollection",
 //  "features":[{"type":"Feature",
@@ -42,12 +40,12 @@ var link = "static/data/ca_california_zip_codes_geo.min.json"
 
 // The function that will determine the color of a neighborhood based on the borough that it belongs to
 function chooseZip(zipCode) {
-  if (zipCode > "95000") return "yellow";
-  else if (zipCode > "94000") return "red";
-  else if (zipCode > "93000") return "orange";
-  else if (zipCode > "92000") return "green";
+  if (zipCode > "95000") return "blue";
+  else if (zipCode > "94000") return "blue";
+  else if (zipCode > "93000") return "blue";
+  else if (zipCode > "92000") return "blue";
   else if (zipCode > "90099") return "purple";
-  else return "blue";
+  else return "black";
 }
 
 // Getting our GeoJSON data (pt1)
@@ -101,4 +99,4 @@ d3.json(link).then(function(data) {
   }).addTo(myMap);
 });
 
-init();
+// init();

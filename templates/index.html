@@ -14,6 +14,9 @@
     integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q=="
     crossorigin=""></script>
 
+    <!-- leaflet-choropleth JavaScript -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/choropleth.js') }}"></script>
+
     <!-- D3 library -->
     <script src="https://d3js.org/d3.v5.min.js"></script>
 
@@ -27,8 +30,9 @@
     <div id="map"></div>
 
     <!-- JavaScript file -->
-    <script type="text/javascript" src="{{ url_for('static', filename='js/logic1-CA.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/logic2.js') }}"></script>
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename='js/logic1-CA.js') }}"></script> -->
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename='js/logic2.js') }}"></script> -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/logic-step4.js') }}"></script>
 
   </body>
 </html>
