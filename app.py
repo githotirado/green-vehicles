@@ -29,11 +29,12 @@ def top10zip():
     df = pd.read_sql_table(table_name="top10byzip", con = engine.connect(), schema ="public")
     return jsonify(df.to_json(orient="records"))
 
-@app.route("/zipandvehicle")
-def zipvehicle():
-    dfzip = pd.read_sql_table(table_name="alternatebyzip", con = engine.connect(), schema ="public")
-    dfzip = dfzip.set_index("zip_code")
-    return jsonify(dfzip.to_dict(orient="index"))
+# Read alternative vehicle counts by zip code from database
+@app.route("/altbyzip")
+def alternatebyzip():
+    altbyzip_df = pd.read_sql_table(table_name="alternatebyzip", con = engine.connect(), schema ="public")
+    altbyzip_df = altbyzip_df.set_index("zip_code")
+    return jsonify(altbyzip_df.to_dict(orient="index"))
 
 
 
