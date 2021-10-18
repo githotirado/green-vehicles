@@ -11,16 +11,19 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 // Load the geoJSON data.
 var geoData = "https://raw.githubusercontent.com/OpenDataDE/State-zip-code-GeoJSON/master/ca_california_zip_codes_geo.min.json"
-// var geoData = "https://2u-data-curriculum-team.s3.amazonaws.com/dataviz-classroom/v1.1/15-Mapping-Web/Median_Household_Income_2016.geojson";
+// var geoData = "/static/data/ca_california_zip_codes_geo.min.json"
 
 var geojson;
 
-// Get the geoJSON and database data with d3.
+// Get the geoJSON and database vehicle data using d3.
 d3.json(geoData).then(function(data) {
   // console.log(data);
   d3.json("http://127.0.0.1:5000/altbyzip").then(function(altbyzip) {
+    // console.log(`geoData length ${data["features"].length}`);
+    // console.log(`database zips length ${altbyzip.length}`);
+
     for (let i = 0; i < data["features"].length; i++) {
-      let currentZip = parseInt(data["features"][i]["properties"]["ZCTA5CE10"])
+      let currentZip = parseInt(data["features"][i]["properties"]["ZCTA5CE10"]);
 
       // Update geoJSON properties with additional vehiclecount property
       // If database does not have a corresponding vehicle count for the zip, skip the assignment
@@ -31,6 +34,8 @@ d3.json(geoData).then(function(data) {
       }
     }
 
+    // console.log(data);
+
     // Create a new choropleth layer
     geojson = L.choropleth(data, {
 
@@ -38,7 +43,7 @@ d3.json(geoData).then(function(data) {
     valueProperty: "vehiclecount",
 
     // Set the color scale
-    scale: ["lightgreen", "green"],
+    scale: ["lightgreen", "darkgreen"],
 
     // The number of breaks in the step range
     steps: 10,
@@ -52,11 +57,29 @@ d3.json(geoData).then(function(data) {
       fillOpacity: 0.8
     },
 
-    // Binding a popup to each layer
+    // Bind a popup to each layer, highlight when selected
     onEachFeature: function(feature, layer) {
       layer.bindPopup("Zip Code: " + feature.properties.ZCTA5CE10 + "<br><br>" +
         "vehicles: " + feature.properties.vehiclecount);
+      
+      layer.on({
+        // When a user's mouse cursor touches a map feature, the mouseover event calls this function, which makes that feature's opacity change to 90% so that it stands out.
+        mouseover: function(event) {
+          layer = event.target;
+          layer.setStyle({
+            fillOpacity: 0.9
+          });
+        },
+        // When the cursor no longer hovers over a map feature (that is, when the mouseout event occurs), the feature's opacity reverts back to 50%.
+        mouseout: function(event) {
+          layer = event.target;
+          layer.setStyle({
+            fillOpacity: 0.5
+          });
+        },
+      });
     }
+
   }).addTo(myMap);
 
   // Set up the legend

@@ -17,5 +17,6 @@ where   fuel in (
 -- 				,'Gasoline'
 			    )
 group by zip_code
-order by zip_code
+-- order by zip_code
+order by sum(vehicles) desc
 );
