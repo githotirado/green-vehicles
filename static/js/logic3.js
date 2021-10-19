@@ -15,27 +15,34 @@ var geoData = "https://raw.githubusercontent.com/OpenDataDE/State-zip-code-GeoJS
 
 var geojson;
 
-// Get the geoJSON and database vehicle data using d3.
+// Current Make placeholder
+var chosenMake = "TESLA";
+
+// Get the geoJSON Zip Code/properties/geometry data using d3.
 d3.json(geoData).then(function(data) {
   // console.log(data);
-  d3.json("http://127.0.0.1:5000/altbyzip").then(function(altbyzip) {
+
+  // Get Zip Code/count from Postgres db using d3/Flask, passing chosenMake variable
+  d3.json("http://127.0.0.1:5000/altbymakezip/" + chosenMake).then(function(altbymakezip) {
     // console.log(`geoData length ${data["features"].length}`);
-    // console.log(`database zips length ${altbyzip.length}`);
+
+    // Data has now been filtered by car make through Flask
+    // console.log(altbymakezip)
 
     for (let i = 0; i < data["features"].length; i++) {
       let currentZip = parseInt(data["features"][i]["properties"]["ZCTA5CE10"]);
 
       // Update geoJSON properties with additional vehiclecount property
       // If database does not have a corresponding vehicle count for the zip, set to zero
-      if (altbyzip.hasOwnProperty([currentZip])) {
-        data["features"][i]["properties"]["vehiclecount"] = altbyzip[currentZip]["sum"];
+      if (altbymakezip.hasOwnProperty([currentZip])) {
+        data["features"][i]["properties"]["vehiclecount"] = altbymakezip[currentZip]["sum"];
       } else {
         data["features"][i]["properties"]["vehiclecount"] = 0;
-        console.log(`Info: No count reported for zip ${currentZip}`)
+      //   console.log(`Info: No count reported for zip ${currentZip}`)
       }
     }
 
-    // console.log(data);
+    console.log(data);
 
     // Create a new choropleth layer
     geojson = L.choropleth(data, {
@@ -45,7 +52,7 @@ d3.json(geoData).then(function(data) {
 
       // Set the color scale
       scale: ["orange", "yellow", "darkgreen"],
-
+      
       // The number of breaks in the step range
       steps: 10,
 
@@ -60,16 +67,18 @@ d3.json(geoData).then(function(data) {
 
       // Bind a popup to each layer, highlight when selected
       onEachFeature: function(feature, layer) {
-        layer.bindPopup("Zip Code: " + feature.properties.ZCTA5CE10 + "<br><br>" +
+        layer.bindPopup("Zip Code: " + feature.properties.ZCTA5CE10 + "<br>" +
+          "make: " + chosenMake + "<br>" +
           "vehicles: " + feature.properties.vehiclecount
         );
+        
       }
 
     }).addTo(myMap);
 
     // Set up the legend
     var legend = L.control({ position: "bottomleft" });
-
+    
     legend.onAdd = function() {
       var div = L.DomUtil.create("div", "info legend");
       var limits = geojson.options.limits;
