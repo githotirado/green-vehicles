@@ -23,18 +23,32 @@ var myDict = {};
 // Get the geoJSON Zip Code/properties/geometry data using d3.
 d3.json(geoData).then(function(data) {
 
-  // Create a zip code object from database containing all car makes
-  // and their registered vehicle counts per zip code.  For use on geoJSON file properties
+  // Create a zip code object from the database containing all car makes and their
+  // registered vehicle counts per zip code.  For later add to geoJSON properties
   d3.json("http://127.0.0.1:5000/altbyzipmake").then(function(altbyzipmake) {
 
-    // Populate the array with the zip keys of each available zip code.
-    // If zip code key already exists, add object to existing key.
-    // if key doesn't exist, initiate the first key.
+    // Initiate arrays to hold all possible car makes and zip codes in db
+    var dbMakes = [];
+    var dbZips = [];
+    
+    // Create zip code + auto make object
     for (var j = 0; j < altbyzipmake.length; j++) {
       var localMake = altbyzipmake[j].make;
       var localSum  = altbyzipmake[j].sum;
       var localZip  = altbyzipmake[j].zip_code;
 
+      // Append any new car makes to array dbMakes
+      if (!dbMakes.includes(localMake)) {
+        dbMakes.push(localMake);
+      } 
+
+      // Append any new NUMERIC zip codes to array dbZips
+      if (!dbZips.includes(localZip) && !isNaN(parseInt(localZip))) {
+        dbZips.push(localZip);
+      }
+
+      // If zip code key already exists, add object to existing key.
+      // if key doesn't exist, instantiate the first key.
       if (Object.keys(myDict).includes(localZip)) {
         myDict[localZip][localMake] = localSum;
       } else {
@@ -43,15 +57,27 @@ d3.json(geoData).then(function(data) {
         };
       }
 
+    } 
+
+    // With arrays of car makes and zip codes, ensure every zip code has all car makes
+    // Assign vehicle count '0' to those makes without a count
+    for (var i = 0; i < dbMakes.length; i++) {
+      for (var j = 0; j < dbZips.length; ++j) {
+        let intZip = parseInt(dbZips[j]);
+        let indMake = dbMakes[i];
+        if (!Object.keys(myDict[intZip]).includes(indMake)) {
+          myDict[intZip][indMake] = 0;
+        }
+      }
     }
+    // Send to console the final zip-make object
     console.log(myDict);
   
 
-    // Insert zip code object into the corresponding properties section of geoJSON file
-    //  for every car maker brand and the vehicle counts for each zip code
+    // Insert zip-make object into the geoJSON dataset, accounting for all
+    // zip codes and car makes
     for (let i = 0; i < data["features"].length; i++) {
       let currentZip = parseInt(data["features"][i]["properties"]["ZCTA5CE10"]);
-      // let currentZip = data["features"][i]["properties"]["ZCTA5CE10"];
 
       // Update geoJSON properties with additional vehiclecount property
       // If database does not have a corresponding vehicle count for the zip, set to zero
@@ -60,22 +86,22 @@ d3.json(geoData).then(function(data) {
       } else {
         data["features"][i]["properties"]["vehiclecount"] = 0;
         console.log(`Info: No count reported for zip ${currentZip}`)
-        console.log(myDict[currentZip]);
       }
-      // console.log(data);
+
     }
 
+    // Send to console the final geoJSON dataset with properties
     console.log(data);
 
     // Create a new choropleth layer
     geojson = L.choropleth(data, {
 
-      // Define which property in the features to use.
+      // Define which property for which auto maker in the features to use
       valueProperty: function (feature) {
         return feature.properties.vehiclecount[chosenMake]
       },
 
-      // Set color scale; orange points out near-zero and contrasts with green
+      // Set color scale; orange points out near-zero values and contrasts with green
       scale: ["orange", "yellow", "darkgreen"],
       
       // The number of breaks in the step range
@@ -111,7 +137,7 @@ d3.json(geoData).then(function(data) {
       var labels = [];
 
       // Add the minimum and maximum to the legend
-      var legendInfo = "<h1>County Vehicle Quantity</h1>" +
+      var legendInfo = "<h3>Vehicle Count<br>by County: " + chosenMake + "</h3>" +
         "<div class=\"labels\">" +
           "<div class=\"min\">" + limits[0] + "</div>" +
           "<div class=\"max\">" + limits[limits.length - 1] + "</div>" +
