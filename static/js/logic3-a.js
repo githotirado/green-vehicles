@@ -48,15 +48,15 @@ d3.json("http://127.0.0.1:5000/altbyzipmake").then(function(altbyzipmake) {
         [localMake]: localSum
       };
     }
-    
+
   }
-  console.log(myDict);
+  // console.log(myDict);
 });
 
 console.log(myDict);
 // Get the geoJSON Zip Code/properties/geometry data using d3.
-// d3.json(geoData).then(function(data) {
-//   // console.log(data);
+d3.json(geoData).then(function(data) {
+  // console.log(data);
 
 //   // Get Zip Code/count from Postgres db using d3/Flask
 //   d3.json("http://127.0.0.1:5000/altbyzipmake").then(function(altbyzipmake) {
@@ -65,20 +65,26 @@ console.log(myDict);
 //     // Data has now been filtered by car make through Flask
 //     console.log(altbyzipmake.zip_code[1], altbyzipmake.make[1], altbyzipmake.sum[1]);
 
-//     // for (let i = 0; i < data["features"].length; i++) {
-//     //   let currentZip = parseInt(data["features"][i]["properties"]["ZCTA5CE10"]);
+  for (let i = 0; i < data["features"].length; i++) {
+    // let currentZip = parseInt(data["features"][i]["properties"]["ZCTA5CE10"]);
+    let currentZip = data["features"][i]["properties"]["ZCTA5CE10"];
+    // Update geoJSON properties with additional vehiclecount property
+    // If database does not have a corresponding vehicle count for the zip, set to zero
+    // if (altbyzipmake.hasOwnProperty([currentZip])) {
+    if (myDict.hasOwnProperty([currentZip])) {
+      // data["features"][i]["properties"]["vehiclecount"] = altbyzipmake[currentZip]["sum"];
+      data["features"][i]["properties"]["vehiclecount"] = myDict[currentZip];
+      // console.log(`Success with zip ${currentZip}`);
+      // console.log(myDict[currentZip]);
+    } else {
+      data["features"][i]["properties"]["vehiclecount"] = 0;
+      // console.log(`Info: No count reported for zip ${currentZip}`)
+      console.log(`Failure with zip ${currentZip}`);
+      console.log(myDict[currentZip]);
+    }
+  }
 
-//     //   // Update geoJSON properties with additional vehiclecount property
-//     //   // If database does not have a corresponding vehicle count for the zip, set to zero
-//     //   if (altbyzipmake.hasOwnProperty([currentZip])) {
-//     //     data["features"][i]["properties"]["vehiclecount"] = altbyzipmake[currentZip]["sum"];
-//     //   } else {
-//     //     data["features"][i]["properties"]["vehiclecount"] = 0;
-//     //   //   console.log(`Info: No count reported for zip ${currentZip}`)
-//     //   }
-//     // }
-
-//     // console.log(data);
+  console.log(data);
 
 //     // // Create a new choropleth layer
 //     // geojson = L.choropleth(data, {
@@ -142,4 +148,4 @@ console.log(myDict);
 //     // legend.addTo(myMap);
 //   })
 
-// });
+});
