@@ -9,34 +9,34 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 }).addTo(myMap);
 
-// Load the geoJSON data.
+// Prepare to load the geoJSON data.
 var geoData = "https://raw.githubusercontent.com/OpenDataDE/State-zip-code-GeoJSON/master/ca_california_zip_codes_geo.min.json"
 // var geoData = "/static/data/ca_california_zip_codes_geo.min.json"
 
 var geojson;
 
-// // Current Make placeholder
-// var chosenMake = "TESLA";
+// Current Make placeholder
+var chosenMake = "TESLA";
+
+// Using database table alternatebyzipmake, create a zip code object containing
+// all car makes and their registered vehicle counts per zip code.  For use
+// when adding the object into the geoJSON properties.
+var myDict = {};
 
 d3.json("http://127.0.0.1:5000/altbyzipmake").then(function(altbyzipmake) {
   // Data has now been filtered by car make through Flask
-  console.log(altbyzipmake.length);
+  // console.log(altbyzipmake.length);
   // console.log(altbyzipmake.zip_code.length);
   // console.log(altbyzipmake.zip_code[1], altbyzipmake.make[1], altbyzipmake.sum[1]);
-  console.log(altbyzipmake);
+  // console.log(altbyzipmake);
 
-  // Make the zip code objects
-  var myDict = {};
+  // // Make the zip code objects
+  // var myDict = {};
   
-  var uniqueZip = [];
-
+  // Populate the array with the zip keys of each available zip code.
+  // If zip code key already exists, add object to existing key in dictionary.
+  // if key doesn't exist, initiate the first key.
   for (var j = 0; j < altbyzipmake.length; j++) {
-
-    // populate the array with the zip keys of each available zip code
-    // if key zip code already exists, add new key value to existing dictionary
-    // if it doesn't, create the first entry for the zip.  Then loop through geoJSON
-    // and use myDict to populate the rest.
-    
     var localMake = altbyzipmake[j].make;
     var localSum  = altbyzipmake[j].sum;
     var localZip  = altbyzipmake[j].zip_code;
@@ -45,27 +45,15 @@ d3.json("http://127.0.0.1:5000/altbyzipmake").then(function(altbyzipmake) {
       myDict[localZip][localMake] = localSum;
     } else {
       myDict[localZip] = {
-        localMake: localSum
+        [localMake]: localSum
       };
     }
-    console.log(myDict);
-    //  The scenario:
-    // myDict[localZip][localMake] = localSum;
-
-    // Maybe: read in the data from myDict, then append the
-    //   current localDict to it, then write it back to myDict
-    // var localDict = {};
-    // localDict[localMake] = localSum;
-    // console.log(localDict);
-
-    // myDict[localZip] = localDict;
-    // myDict[localZip].append(localDict);  // For arrays
-    // myDict[localZip].push(localDict);    // For arrays
-    // myDict.push(localDict);              // For arrays
+    
   }
   console.log(myDict);
 });
 
+console.log(myDict);
 // Get the geoJSON Zip Code/properties/geometry data using d3.
 // d3.json(geoData).then(function(data) {
 //   // console.log(data);
