@@ -1,6 +1,7 @@
 body {
   padding: 0;
   margin: 0;
+  background-color: white;
 }
 
 #map,
@@ -28,6 +29,11 @@ h4 {
 h1,
 span {
   font-weight: bold;
+}
+
+.map-region {
+  background-color: yellow;
+  height: 800px;
 }
 
 /* CSS from the leaflet-choropleth documentation */
