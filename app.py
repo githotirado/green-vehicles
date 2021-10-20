@@ -47,7 +47,14 @@ def alternatebymakezip(carmake):
     # altbymakezip_df = altbymakezip_df.set_index("make")
     # return jsonify(altbymakezip_df.to_dict(orient="records"))
 
-
+# Read alternative vehicle counts by zip code and make from database
+@app.route("/altbyzipmake")
+def alternatebyzipmake():
+    altbyzipmake_df = pd.read_sql_table(table_name="alternatebyzipmake", con = engine.connect(), schema ="public")
+    # Use Pandas filtering to get only requested car make, select needed columns, set index
+    # altbyzipmake_df = altbyzipmake_df.loc[altbyzipmake_df["make"] == carmake]
+    # altbyzipmake_df = altbyzipmake_df[["zip_code","sum"]].set_index("zip_code")
+    return jsonify(altbyzipmake_df.to_dict(orient="records"))
 
 if __name__ == "__main__":
     app.run()
