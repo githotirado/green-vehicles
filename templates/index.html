@@ -17,19 +17,17 @@
     <link rel="stylesheet" type="text/css" href="../static/css/styles.css" />
 
     <!-- Leaflet CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css"
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.3/dist/leaflet.css"
       integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
-      crossorigin=""
-    />
+      crossorigin=""/>
 
     <!-- Leaflet JavaScript code -->
-    <script
-      src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js"
+    <script src="https://unpkg.com/leaflet@1.3.3/dist/leaflet.js"
       integrity="sha512-tAGcCfR4Sc5ZP5ZoVz0quoZDYX5aCtEm/eu1KhSLj2c9eFrylXZknQYmxUssFaVJKvvc0dJQixhGjG2yXWiV9Q=="
-      crossorigin=""
-    ></script>
+      crossorigin=""></script>
+
+    <!-- leaflet-choropleth JavaScript -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/choropleth.js') }}"></script>
 
     <!-- D3 library -->
     <script src="https://d3js.org/d3.v5.min.js"></script>
@@ -110,13 +108,11 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
-    <script
-      type="text/javascript"
-      src="{{ url_for('static', filename='js/logic1-CA.js') }}"
-    ></script>
-    <script
-      type="text/javascript"
-      src="{{ url_for('static', filename='js/logic2.js') }}"
-    ></script>
+
+    <!-- JavaScript files -->
+    <!-- <script type="text/javascript" src="{{ url_for('static', filename='js/logic1-CA-all.js') }}"></script> -->
+    <script type="text/javascript" src="{{ url_for('static', filename='js/logic1-CA-bymake.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/logic2.js') }}"></script>
+
   </body>
 </html>
