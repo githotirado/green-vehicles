@@ -1,0 +1,39 @@
+body {
+  padding: 0;
+  margin: 0;
+}
+
+#map,
+body,
+html {
+  height: 100%;
+}
+.myContainer {
+  border: 1px solid hsl(350, 100%, 25%);
+  /* height: max; */
+}
+
+.myNavbar {
+  background: rgb(238, 108, 221);
+  height: 70px;
+}
+
+#row1.col1 {
+  background-color: tomato;
+  height: 300px;
+}
+
+#row1.col2.subRow1 {
+  border: rgb(22, 231, 15);
+  height: 150px;
+}
+
+#row1.col2.subRow2 {
+  border: rgb(213, 15, 231);
+  height: 150px;
+}
+
+.myRow {
+  background-color: rgb(163, 240, 152);
+  height: 300px;
+}

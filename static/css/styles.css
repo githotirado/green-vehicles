@@ -1,12 +1,39 @@
 body {
   padding: 0;
   margin: 0;
+  background-color: white;
 }
 
 #map,
+#fueltype,
+#modelyear,
 body,
 html {
   height: 100%;
+}
+
+html,
+body,
+select {
+  color: #28a745;
+  font-family: "Noto Sans Mono", monospace;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Roboto", sans-serif;
+}
+
+h1,
+span {
+  font-weight: bold;
+}
+
+.map-region {
+  background-color: yellow;
+  height: 800px;
 }
 
 /* CSS from the leaflet-choropleth documentation */
@@ -16,8 +43,8 @@ html {
   font: 12px Arial, Helvetica, sans-serif;
   font-weight: bold;
   background: white;
-  background: rgba(255,255,255,0.8);
-  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
 }
 .legend ul {
@@ -37,8 +64,4 @@ html {
 }
 .legend .max {
   float: right;
-}
-
-h1 {
-  text-align: center;
 }
