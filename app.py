@@ -52,6 +52,26 @@ def vehiclecount2020():
     df_vehiclecount2020_json = df_vehiclecount2020.to_dict(orient="records")
     return jsonify(df_vehiclecount2020_json)
 
+# Read alternative vehicle counts by zip code from database
+@app.route("/altbyzip")
+def alternatebyzip():
+    altbyzip_df = pd.read_sql_table(table_name="alternatebyzip", con = engine.connect(), schema ="public")
+    altbyzip_df = altbyzip_df.set_index("zip_code")
+    return jsonify(altbyzip_df.to_dict(orient="index"))
+
+# Read alternative vehicle counts by make and zip code from database
+@app.route("/altbymakezip/<carmake>")
+def alternatebymakezip(carmake):
+    altbymakezip_df = pd.read_sql_table(table_name="alternatebymakezip", con = engine.connect(), schema ="public")
+    altbymakezip_df = altbymakezip_df.loc[altbymakezip_df["make"] == carmake]
+    altbymakezip_df = altbymakezip_df[["zip_code","sum"]].set_index("zip_code")
+    return jsonify(altbymakezip_df.to_dict(orient="index"))
+
+# Read alternative vehicle counts by zip code and make from database
+@app.route("/altbyzipmake")
+def alternatebyzipmake():
+    altbyzipmake_df = pd.read_sql_table(table_name="alternatebyzipmake", con = engine.connect(), schema ="public")
+    return jsonify(altbyzipmake_df.to_dict(orient="records"))
 
 if __name__ == "__main__":
     app.run()
