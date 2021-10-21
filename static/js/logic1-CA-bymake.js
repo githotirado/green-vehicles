@@ -1,3 +1,111 @@
+// Function to draw Choropleth map of green vehicle counts when given the car Make
+//  Uses database object and geoJSON object
+function drawMap(mapData, carMake, dbMakeData) {
+  // Create a new choropleth layer
+  geojson = L.choropleth(mapData, {
+
+    // Define which property for which auto maker in the features to use
+    valueProperty: function (feature) {
+      return feature.properties.vehiclecount[carMake]
+    },
+
+    // Set color scale; orange points out near-zero values and contrasts with green
+    scale: ["orange", "yellow", "darkgreen"],
+    
+    // The number of breaks in the step range
+    steps: 10,
+
+    // q for quartile, e for equidistant, k for k-means
+    mode: "q",
+    style: {
+      // Border color
+      color: "#fff",
+      weight: 0.7,
+      fillOpacity: 0.8
+    },
+
+    // Bind a popup to each layer, highlight when selected
+    onEachFeature: function(feature, layer) {
+      layer.bindPopup("Zip Code: " + feature.properties.ZCTA5CE10 + "<br>" +
+        "make: " + carMake + "<br>" +
+        "vehicles: " + feature.properties.vehiclecount[carMake]
+      );
+      
+    }
+
+  }).addTo(myMap);
+
+  // Set up the legend
+  var legend = L.control({ position: "bottomleft" });
+    
+  legend.onAdd = function() {
+    var div = L.DomUtil.create("div", "info legend");
+    var limits = geojson.options.limits;
+    var colors = geojson.options.colors;
+    var labels = [];
+
+    // Add the minimum and maximum to the legend
+    var legendInfo = "<h3>Vehicle Count<br>by County: " + carMake + "</h3>" +
+      "<div class=\"labels\">" +
+        "<div class=\"min\">" + limits[0] + "</div>" +
+        "<div class=\"max\">" + limits[limits.length - 1] + "</div>" +
+      "</div>";
+
+    div.innerHTML = legendInfo;
+
+    limits.forEach(function(limit, index) {
+      labels.push("<li style=\"background-color: " + colors[index] + "\"></li>");
+    });
+
+    div.innerHTML += "<ul>" + labels.join("") + "</ul>";
+    return div;
+  };
+
+  // Add the legend to the map
+  legend.addTo(myMap);
+
+  // Find top 10 zip codes for chosen car Make
+  var dbTop10 = [];
+  for (var j = 0; j < dbMakeData.length; j++) {
+    var localMake = dbMakeData[j].make;
+    var localSum  = dbMakeData[j].sum;
+    var localZip  = dbMakeData[j].zip_code;
+
+    // Append 10 NUMERIC zip codes to array dbTop10 for current car make
+    var topCount = 10;
+    if (localMake == carMake && !isNaN(parseInt(localZip)) && Object.keys(dbTop10).length <= topCount) {
+      dbTop10.push(localZip);
+    }
+  };
+
+  // With top 10 zips, place markers using properties from geoJSON object
+  for (let i = 0; i < mapData["features"].length; i++) {
+    let mapProperty = mapData["features"][i]["properties"]
+    let currentZip = mapProperty["ZCTA5CE10"];
+
+    if (dbTop10.includes(currentZip)) {
+      var markerCount = mapProperty["vehiclecount"][carMake];
+      var markerLat = mapProperty["INTPTLAT10"];
+      var markerLon = mapProperty["INTPTLON10"];
+      console.log(`Top10: ${carMake}, ${currentZip}, count ${markerCount}, coord ${markerLat}, ${markerLon}`);
+      var marker = L.marker([markerLat, markerLon], {
+        title: currentZip
+      }).addTo(myMap);
+      marker.bindPopup(`<h3>${currentZip}</h3> <hr> <h4>${carMake}: ${markerCount}</h4>`);
+    }
+
+  }
+
+};
+
+//                         M A I N   I N I T   S E C T I O N
+
+// Set the initial chosen Make for first map, use dropDown changes to change map
+// var chosenMake = "TOYOTA";
+// var chosenMake = "TESLA";
+var chosenMake = "BMW";
+
+
 // Create the map object
 var myMap = L.map("map", {
   center: [34.0522, -118.2437],
@@ -15,9 +123,6 @@ var geoData = "https://raw.githubusercontent.com/OpenDataDE/State-zip-code-GeoJS
 
 var geojson;
 
-// Current Make placeholder
-var chosenMake = "TESLA";
-
 var myDict = {};
 
 // Get the geoJSON Zip Code/properties/geometry data using d3.
@@ -31,7 +136,7 @@ d3.json(geoData).then(function(data) {
     var dbMakes = [];
     var dbZips = [];
     
-    // Create zip code + auto make object
+    // Create zip code + auto maker object
     for (var j = 0; j < altbyzipmake.length; j++) {
       var localMake = altbyzipmake[j].make;
       var localSum  = altbyzipmake[j].sum;
@@ -74,8 +179,7 @@ d3.json(geoData).then(function(data) {
     console.log(myDict);
   
 
-    // Insert zip-make object into the geoJSON dataset, accounting for all
-    // zip codes and car makes
+    // Insert zip-carmake-sum data into the geoJSON dataset for all zips, car makes
     for (let i = 0; i < data["features"].length; i++) {
       let currentZip = parseInt(data["features"][i]["properties"]["ZCTA5CE10"]);
 
@@ -85,7 +189,7 @@ d3.json(geoData).then(function(data) {
         data["features"][i]["properties"]["vehiclecount"] = myDict[currentZip];
       } else {
         data["features"][i]["properties"]["vehiclecount"] = 0;
-        console.log(`Info: No count reported for zip ${currentZip}`)
+        // console.log(`Info: No vehicles in zip ${currentZip}`)
       }
 
     }
@@ -93,68 +197,9 @@ d3.json(geoData).then(function(data) {
     // Send to console the final geoJSON dataset with properties
     console.log(data);
 
-    // Create a new choropleth layer
-    geojson = L.choropleth(data, {
-
-      // Define which property for which auto maker in the features to use
-      valueProperty: function (feature) {
-        return feature.properties.vehiclecount[chosenMake]
-      },
-
-      // Set color scale; orange points out near-zero values and contrasts with green
-      scale: ["orange", "yellow", "darkgreen"],
-      
-      // The number of breaks in the step range
-      steps: 10,
-
-      // q for quartile, e for equidistant, k for k-means
-      mode: "q",
-      style: {
-        // Border color
-        color: "#fff",
-        weight: 0.7,
-        fillOpacity: 0.8
-      },
-
-      // Bind a popup to each layer, highlight when selected
-      onEachFeature: function(feature, layer) {
-        layer.bindPopup("Zip Code: " + feature.properties.ZCTA5CE10 + "<br>" +
-          "make: " + chosenMake + "<br>" +
-          "vehicles: " + feature.properties.vehiclecount[chosenMake]
-        );
-        
-      }
-
-    }).addTo(myMap);
-
-    // Set up the legend
-    var legend = L.control({ position: "bottomleft" });
-      
-    legend.onAdd = function() {
-      var div = L.DomUtil.create("div", "info legend");
-      var limits = geojson.options.limits;
-      var colors = geojson.options.colors;
-      var labels = [];
-
-      // Add the minimum and maximum to the legend
-      var legendInfo = "<h3>Vehicle Count<br>by County: " + chosenMake + "</h3>" +
-        "<div class=\"labels\">" +
-          "<div class=\"min\">" + limits[0] + "</div>" +
-          "<div class=\"max\">" + limits[limits.length - 1] + "</div>" +
-        "</div>";
-
-      div.innerHTML = legendInfo;
-
-      limits.forEach(function(limit, index) {
-        labels.push("<li style=\"background-color: " + colors[index] + "\"></li>");
-      });
-
-      div.innerHTML += "<ul>" + labels.join("") + "</ul>";
-      return div;
-    };
-
-    // Add the legend to the map
-    legend.addTo(myMap);
+    // Create Choropleth map for chosen car make using geoJSON data object
+    //  and db object for sorted top 10 markers
+    drawMap(data, chosenMake, altbyzipmake);
 
   });
 
