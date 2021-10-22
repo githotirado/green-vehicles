@@ -37,7 +37,7 @@ function drawMap(mapData, carMake, dbMakeData) {
 
   // Set up the legend
   var legend = L.control({ position: "bottomleft" });
-    
+
   legend.onAdd = function() {
     var div = L.DomUtil.create("div", "info legend");
     var limits = geojson.options.limits;
@@ -62,6 +62,7 @@ function drawMap(mapData, carMake, dbMakeData) {
   };
 
   // Add the legend to the map
+  // myMap.removeControl(legend);
   legend.addTo(myMap);
 
   // Find top 10 zip codes for chosen car Make
@@ -101,8 +102,6 @@ function drawMap(mapData, carMake, dbMakeData) {
 //                         M A I N   I N I T   S E C T I O N
 
 // Set the initial chosen Make for first map, use dropDown changes to change map
-// var chosenMake = "TOYOTA";
-// var chosenMake = "TESLA";
 var chosenMake = "BMW";
 
 
@@ -200,6 +199,15 @@ d3.json(geoData).then(function(data) {
     // Create Choropleth map for chosen car make using geoJSON data object
     //  and db object for sorted top 10 markers
     drawMap(data, chosenMake, altbyzipmake);
+
+    // Set up an event, use the drop-down to redraw map between car makers
+    d3.selectAll("#selDataset").on("change",redraw);
+
+    function redraw() {
+      var dropdownMenu = d3.select("#selDataset");
+      var dropDownValue = dropdownMenu.property("value");
+      drawMap(data, dropDownValue, altbyzipmake);
+    };
 
   });
 
