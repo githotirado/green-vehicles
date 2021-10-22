@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request, redirect
+from flask import Flask, jsonify, render_template, request, redirect, url_for
 import pandas as pd 
 import json 
 import psycopg2
@@ -73,5 +73,11 @@ def alternatebyzipmake():
     altbyzipmake_df = pd.read_sql_table(table_name="alternatebyzipmake", con = engine.connect(), schema ="public")
     return jsonify(altbyzipmake_df.to_dict(orient="records"))
 
+@app.route("/alternatebyfuelyear")
+def alternatebyfuelyear():
+    df_alternatebyfuelyear = pd.read_sql_table(table_name="alternatebyfuelyear", con = engine.connect(), schema ="public")
+    df_alternatebyfuelyear_json = df_alternatebyfuelyear.to_dict(orient="records")
+    return jsonify(df_alternatebyfuelyear_json)
+
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
