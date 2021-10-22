@@ -1,6 +1,21 @@
 // Function to draw Choropleth map of green vehicle counts when given the car Make
 //  Uses database object and geoJSON object
 function drawMap(mapData, carMake, dbMakeData) {
+
+  // Re-create the map object if it already existed
+  if (myMap) myMap.remove();
+  myMap = L.map("map", {
+    center: [34.0522, -118.2437],
+    zoom: 9
+  });
+
+  // Add the tile layer
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(myMap);
+
+  var geojson;
+
   // Create a new choropleth layer
   geojson = L.choropleth(mapData, {
 
@@ -62,7 +77,6 @@ function drawMap(mapData, carMake, dbMakeData) {
   };
 
   // Add the legend to the map
-  // myMap.removeControl(legend);
   legend.addTo(myMap);
 
   // Find top 10 zip codes for chosen car Make
@@ -74,7 +88,7 @@ function drawMap(mapData, carMake, dbMakeData) {
 
     // Append 10 NUMERIC zip codes to array dbTop10 for current car make
     var topCount = 10;
-    if (localMake == carMake && !isNaN(parseInt(localZip)) && Object.keys(dbTop10).length <= topCount) {
+    if (localMake == carMake && !isNaN(parseInt(localZip)) && Object.keys(dbTop10).length < topCount) {
       dbTop10.push(localZip);
     }
   };
@@ -88,7 +102,7 @@ function drawMap(mapData, carMake, dbMakeData) {
       var markerCount = mapProperty["vehiclecount"][carMake];
       var markerLat = mapProperty["INTPTLAT10"];
       var markerLon = mapProperty["INTPTLON10"];
-      console.log(`Top10: ${carMake}, ${currentZip}, count ${markerCount}, coord ${markerLat}, ${markerLon}`);
+      // console.log(`Top10: ${carMake}, ${currentZip}, count ${markerCount}, coord ${markerLat}, ${markerLon}`);
       var marker = L.marker([markerLat, markerLon], {
         title: currentZip
       }).addTo(myMap);
@@ -108,20 +122,14 @@ var chosenMake = "BMW";
 // Create the map object
 var myMap = L.map("map", {
   center: [34.0522, -118.2437],
-  zoom: 10
+  zoom: 9
 });
-
-// Add the tile layer
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(myMap);
 
 // Prepare to load the geoJSON data.
 var geoData = "https://raw.githubusercontent.com/OpenDataDE/State-zip-code-GeoJSON/master/ca_california_zip_codes_geo.min.json"
 // var geoData = "/static/data/ca_california_zip_codes_geo.min.json"
 
-var geojson;
-
+// Instantiate object that will hold zip-carmake data from the database
 var myDict = {};
 
 // Get the geoJSON Zip Code/properties/geometry data using d3.
@@ -175,7 +183,7 @@ d3.json(geoData).then(function(data) {
       }
     }
     // Send to console the final zip-make object
-    console.log(myDict);
+    // console.log(myDict);
   
 
     // Insert zip-carmake-sum data into the geoJSON dataset for all zips, car makes
@@ -194,17 +202,17 @@ d3.json(geoData).then(function(data) {
     }
 
     // Send to console the final geoJSON dataset with properties
-    console.log(data);
+    // console.log(data);
 
-    // Create Choropleth map for chosen car make using geoJSON data object
-    //  and db object for sorted top 10 markers
+    // Create first Choropleth map for chosen car make and top-10 markers using geoJSON
+    //  data object and database query
     drawMap(data, chosenMake, altbyzipmake);
 
-    // Set up an event, use the drop-down to redraw map between car makers
-    d3.selectAll("#selDataset").on("change",redraw);
+    // Set up an event, use the drop-down to redraw map for other car makers
+    d3.selectAll("#SelectMake").on("change",redraw);
 
     function redraw() {
-      var dropdownMenu = d3.select("#selDataset");
+      var dropdownMenu = d3.select("#SelectMake");
       var dropDownValue = dropdownMenu.property("value");
       drawMap(data, dropDownValue, altbyzipmake);
     };

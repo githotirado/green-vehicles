@@ -65,10 +65,9 @@
         // Get the data
         var newArray;
         var valuesAll;
-        d3.csv('../static/data/2018.csv', function(error, data) {
-             if (error) throw error;
+        d3.csv('../static/data/2018.csv').then (function(data) {
             valuesAll = data;
-             //console.log(data);
+            // console.log(data);
             //make Brand
             var uniqueMake = data
              .map(e => e['Make'])
