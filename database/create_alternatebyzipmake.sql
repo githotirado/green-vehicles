@@ -19,7 +19,7 @@ where   fuel in (
 			    )
 group by zip_code
 		,make
--- order by zip_code
-order by zip_code
+order by sum(vehicles) desc
+		,zip_code
 		,make
 );
