@@ -27,7 +27,8 @@ select {
   line-height: inherit;
 
    /* Stack above custom arrow */
-  z-index: 1;
+  z-index: 10;
+  
 
   /* Remove dropdown arrow in IE10 & IE11 */
     @link https://www.filamentgroup.com/lab/select-css.html
@@ -96,8 +97,6 @@ select[multiple] {
 
   option {
     white-space: normal;
-
-     /* Only affects Chrome */
     outline-color var(--select-focus);
   }
 
@@ -150,6 +149,8 @@ body {
 .maineDropdown{
 	float:left;
 	margin-right:10px;
+  position: relative;
+  z-index: 9999;
 }
 .bottomContainer{
 	float:left;
