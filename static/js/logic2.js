@@ -1,5 +1,5 @@
 				//barchart start
-				var margin = {top: 20, right: 20, bottom: 200, left: 50},
+				/*var margin = {top: 20, right: 20, bottom: 200, left: 50},
 					width = 700 - margin.left - margin.right,
 					height = 450 - margin.top - margin.bottom
 				var xScale = d3.scaleBand().range([0, width]).padding(0.4),
@@ -12,7 +12,7 @@
 				  .append('g')
 					.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 				//tooltip for chart
-				var tooltip = d3.select("body").append("div").attr("class", "toolTip");
+				var tooltip = d3.select("body").append("div").attr("class", "toolTip");*/
 			//barchart end
 			//onchange function start for fuel 
 			var changeFuel  = '';
@@ -32,25 +32,7 @@
 			  changeMake = fu.options[fu.selectedIndex].value;
 			  document.getElementById("tableTitle").innerHTML = '<span>'+changeMake+' Cars By Fuel Type in 2020</span>';
 			  document.getElementById("bottomTable").innerHTML = '<span>'+changeMake+' Cars By Model Year of 2020</span>';
-			 if(fuleSelected.length<=3){
-				 document.getElementById('tableHead').style.width =  "693px";
-				 document.getElementById('tableBottom').style.width =  "693px";
-			 }else{
-				 let length = fuleSelected.length+1;
-				 let fuelWidth = length*155;
-				 document.getElementById('tableHead').style.width =  fuelWidth+"px";
-				 document.getElementById('tableBottom').style.width =  fuelWidth+"px";
-			 }
-			  
-			  let strFuleHead = '<div class="modelHead">Model Year</div>';
-			  fuleSelected.forEach(res => {
-					strFuleHead += '<div class="fuelHead">'+res+'</div>';
-				})
-			  document.getElementById("tableHead").innerHTML = strFuleHead;
 			  ShowHide(document.getElementById('topTable'));
-			  //remove d3 chart on change
-			  d3.select("svg").remove();
-			  //added new chart on ui
 			  callOnChange();
 			}
 			fu.onchange=showMake;
@@ -59,8 +41,7 @@
 			// Get the data
 			var newArray;
 			var valuesAll;
-			d3.json("/alternatebyfuelyear").then(function(data) {
-				//if (error) throw error;
+			d3.json("/alternatebyfuelyear").then(function(data){
 				valuesAll = data;
 				//make Brand select box start
 				var uniqueMake = data
@@ -119,13 +100,13 @@
 				newArray = [];
 				resultFiltered = [];
 				//Start bar chart
-				var g = d3.select("#chart").append("svg")
+				/*var g = d3.select("#chart").append("svg")
 			  .attr("width", width + margin.left + margin.right)
 			  .attr("height", height + margin.top + margin.bottom)
 			  .append('g')
-				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+				.attr("transform", "translate(" + margin.left + "," + margin.top + ")");*/
 				//data filter on fuel
-				newArray = valuesAll.filter(function (el){return el.make === changeMake && (fuleSelected.includes(el.fuel) && fuleSelected.includes(el.fuel));});
+				newArray = valuesAll.filter(function (el){return el.make === changeMake && (fuelSelected.includes(el.fuel) && fuelSelected.includes(el.fuel));});
 				var objNew = newArray.reduce(function(r, e) {
 				  if (!r[e.fuel]) r[e.fuel] = e
 				  else r[e.fuel] = Array.isArray(r[e.fuel]) ? r[e.fuel].concat(e) : [r[e.fuel]].concat(e)
@@ -138,92 +119,122 @@
 				var obj1 = [];
 				newArrayVal = [];
 				//data formating 
-					const formater =  d3.format(",d");
-				//data filter after fuel on model years
-				fuleSelected.forEach(function(v, i) {
+					//const formater =  d3.format(",d");
+				//data filter after feul on model years
+				fuelSelected.forEach(function(v, i) {
 					if(resultVal[i] && resultVal[i].length>0){
+						//console.log(resultVal[i]);
 						var holder1 = {};
 						
 						resultVal[i].forEach(function(d) {
 						  if (holder1.hasOwnProperty(d.model_year)) {
 							holder1[d.model_year] = holder1[d.model_year] + d.sum;
+							//holder1.fuel = d.fuel;
 						  } else {
 							holder1[d.model_year] = d.sum;
+							//holder1.fuel = d.fuel;
 						  }
 						});
+						//console.log(holder1);
 						obj1 = [];
 						for (var prop in holder1) {
 						  obj1.push({ model_year: prop, sum: holder1[prop] });
 						}
+						obj1.map(item => item.fuel = resultVal[i][0].fuel);
+						//console.log(obj1);
 						newArrayVal.push(obj1);
 					}	
 				})
+				//console.log(newArrayVal);
 				//data sum on model years
 				var forYears = [];
 				newArrayVal.forEach((mt, mi)=>{
 					mt.forEach((t)=>{
-						if(forYears.length===0){
+						//console.log(t);
+						forYears.push(t);
+						/*if(forYears.length===0){
 							forYears = mt;
+							console.log(mt);
 						}else{
 							if(mi>0){
+								//console.log(mt);
 								forYears.forEach((st, si)=>{
+									console.log(t.model_year);
+									console.log(st.model_year);
 									if(t.model_year === st.model_year){
 										st['sum'+mi] = t.sum;
+									}else{
+										forYears.push(t);
 									}
 								})
 							}
-						}
+						}*/
+						
 					})
 				})
 				forYears.sort(function(a, b) {
 					return parseFloat(a.model_year) - parseFloat(b.model_year);
 				});
-				//data separate for fuel type and append on ui
-				forYears.forEach((val)=>{
-					let sum1 = '';
-					if(val.sum1){
-						sum1 = '<div class="fuelBottom">'+formater(val.sum1)+'</div>';
-					}
-					let sum2 = '';
-					if(val.sum2){
-						sum2 = '<div class="fuelBottom">'+formater(val.sum2)+'</div>';
-					}
-					let sum3 = '';
-					if(val.sum3){
-						sum3 = '<div class="fuelBottom">'+formater(val.sum3)+'</div>';
-					}
-					let sum4 = '';
-					if(val.sum4){
-						sum4 = '<div class="fuelBottom">'+formater(val.sum4)+'</div>';
-					}
-					let sum5 = '';
-					if(val.sum5){
-						sum5 = '<div class="fuelBottom">'+formater(val.sum5)+'</div>';
-					}
-					let sum6 = '';
-					if(val.sum6){
-						sum6 = '<div class="fuelBottom">'+formater(val.sum6)+'</div>';
-					}
-					let sum7 = '';
-					if(val.sum7){
-						sum7 = '<div class="fuelBottom">'+formater(val.sum7)+'</div>';
-					}
-					let sum8 = '';
-					if(val.sum8){
-						sum8 = '<div class="fuelBottom">'+formater(val.sum8)+'</div>';
-					}
-					let sum9 = '';
-					if(val.sum9){
-						sum9 = '<div class="fuelBottom">'+formater(val.sum9)+'</div>';
-					}
-					let sum10 = '';
-					if(val.sum10){
-						sum10 = '<div class="fuelBottom">'+formater(val.sum10)+'</div>';
-					}
-					
-					bottomContent += '<div class="tableBottom"><div class="modelBottom">'+val.model_year+'</div><div class="fuelBottom">'+val.sum+'</div>'+sum1+''+sum2+''+sum3+''+sum4+''+sum5+''+sum6+''+sum7+''+sum8+''+sum9+''+sum10+'</div>';
-				})
 				
+				//console.log(forYears);
+				
+				if(forYears.length<=3){
+				 document.getElementById('tableHead').style.width =  "693px";
+				 document.getElementById('tableBottom').style.width =  "693px";
+			 }else{
+				 let length = forYears.length+1;
+				 let fuelWidth = length*155;
+				 document.getElementById('tableHead').style.width =  fuelWidth+"px";
+				 document.getElementById('tableBottom').style.width =  fuelWidth+"px";
+			 }
+			  
+			  var output = [];
+
+				forYears.forEach(function(item) {
+				  var existing = output.filter(function(v, i) {
+					return v.model_year == item.model_year;
+				  });
+				  if (existing.length) {
+					var existingIndex = output.indexOf(existing[0]);
+					output[existingIndex].fuel = output[existingIndex].fuel.concat(item.fuel);
+					output[existingIndex].sum = output[existingIndex].sum.concat(item.sum);
+				  } else {
+					if (typeof item.fuel == 'string')
+					  item.fuel = [item.fuel];
+				  
+					item.sum = [item.sum];
+					output.push(item);
+				  }
+				});
+
+			  /*forYears.forEach(res => {
+					strFuelHead += '<div class="fuelHead">'+res.fuel+'</div>';
+				})*/
+				let strFuelHead = '<div class="modelHead">Model Year</div>';
+				let testV = [];
+				let innBottom;
+				//console.log(forYears);
+				//data separate for fuel type and append on ui
+				output.forEach((val)=>{
+					//console.log(val.fuel);
+					let fuelType = val.fuel;
+					let sumType = val.sum;
+					fuelType.forEach((valSub)=>{
+						if(testV.indexOf(valSub) === -1){
+							testV.push(valSub);
+							strFuelHead += '</div><div class="fuelHead">'+valSub+'</div>';
+						}
+					});
+					let strFuelBottom = '';
+					sumType.forEach((valSub)=>{
+						strFuelBottom+='<div class="fuelBottom">'+valSub+'</div>';
+					})
+					
+					//strFuelHead = '<div class="modelHead">Model Year</div>';
+					bottomContent += '<div class="tableBottom"><div class="modelBottom">'+val.model_year+'</div>'+strFuelBottom;
+				})
+				//console.log(testV);
+				document.getElementById("tableHead").innerHTML = strFuelHead;
 				document.getElementById("tableBottom").innerHTML = bottomContent;
 				
 				var holder = {};
@@ -236,11 +247,29 @@
 				});
 				//data filter on model for chart
 				var obj2 = [];
+				let xl = [];
+				let yl = [];
 				for (var prop in holder) {
-				  obj2.push({ model_year: prop, sum: holder[prop] });
+					xl.push(prop);
+					yl.push(holder[prop]);
 				}
-					
-					// Add X axis
+				var dataChart = [
+				  {
+					x: xl,
+					y: yl,
+					type: 'bar'
+				  }
+				];
+				layout = {
+					paper_bgcolor: "rgba(0,0,0,0)",
+					width: 700,
+					height: 400,
+				 }
+				//Plotly.restyle('chart', 'y', [[]]);
+				Plotly.newPlot('chart', dataChart, layout);
+				//obj2.push({ model_year: prop, sum: holder[prop] });
+				 
+					/*// Add X axis
 					xScale.domain(obj2.map(function(d) { return d.model_year; }));
 					// Add Y axis
 					yScale.domain([
@@ -268,7 +297,7 @@
 					 .attr("dy", "-5.1em")
 					 .attr("text-anchor", "end")
 					 .attr("stroke", "black")
-					 .text("Vehicle");
+					 .text("sum");
 					//chart Bars
 					g.selectAll(".bar")
 					 .data(obj2)
@@ -286,7 +315,7 @@
 							  .style("display", "inline-block")
 							  .html((d.model_year) + "<br>" + " " + (formater(d.sum)));
 						})
-							.on("mouseout", function(d){ tooltip.style("display", "none");});;
+							.on("mouseout", function(d){ tooltip.style("display", "none");});;*/
 				
 			}
 			function ShowHide (elements) {
@@ -306,20 +335,20 @@
 				expanded = false;
 			  }
 			}
-			var fuleSelected= [];
+			var fuelSelected= [];
 			function checkOptions() {
 			  els = document.getElementsByName('categories');
 			  var selectedChecks = "", qtChecks = 0;
-			  fuleSelected = [];
+			  fuelSelected = [];
 			  for (i = 0; i < els.length; i++) {
 				if (els[i].checked) {
 				  if (qtChecks > 0) selectedChecks += ", "
 				  selectedChecks += els[i].value;
-				  fuleSelected.push(els[i].value);
+				  fuelSelected.push(els[i].value);
 				  qtChecks++;
 				}
 			  }
-			  //console.log(fuleSelected);
+			  //console.log(fuelSelected);
 			  if(selectedChecks != "") {
 				document.getElementById("defaultCategory").innerText = selectedChecks;
 			  } else {
