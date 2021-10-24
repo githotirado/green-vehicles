@@ -15,6 +15,8 @@
 	<!-- leaflet-choropleth JavaScript -->
 	<script type="text/javascript" src="{{ url_for('static', filename='js/choropleth.js') }}"></script>
 	<script src="http://d3js.org/d3.v5.min.js"></script>
+	<!-- Plotly -->
+	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 </head>
 <body>
 <div class="container">
@@ -56,11 +58,9 @@
 			<div class="topTable">
 				<div id="topTable" style="display:none; overflow:auto;">
 					<h3 id="tableTitle"></h3>
-					<div class="tableHead" id="tableHead">
-						
+					<div class="tableHead" id="tableHead">	
 					</div>
-					<div id="tableBottom" class="tableBottomMain">
-						
+					<div id="tableBottom" class="tableBottomMain">	
 					</div>
 				</div>
 			</div>
@@ -75,5 +75,4 @@
 <script src= "{{ url_for('static', filename='js/logic2.js') }}"></script>
 <script type="text/javascript" src="{{ url_for('static', filename='js/logic1-CA-bymake.js') }}"></script>
 </body>
-
 </html>

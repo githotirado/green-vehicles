@@ -3,7 +3,7 @@
 ### Teammates:
 
 Henry
-Ehizogie
+E
 Kacee Kira
 
 ### Purpose:

@@ -20,11 +20,11 @@ engine = create_engine(f'postgresql://{connection_string}')
 
 
 #Flask Route 
-@app.route("/")
+@app.route("/index")
 def index(): 
     return render_template("index.html")
 
-@app.route("/detail")
+@app.route("/")
 def detail(): 
     return render_template("detail.html")
 
