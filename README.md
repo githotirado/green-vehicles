@@ -8,7 +8,7 @@ Kacee Kira
 
 ### Purpose:
 
-With Biden’s administration voicing their commitment to move the country towards green cars, we seek to analyze the current usage of demographics of cars in the state of California by focusing on vehicle fuel type by zip codes. This will provide a sense of where California is at in terms of our path towards a greener state and room to create a roadmap in achieving our goal.
+With Biden’s administration voicing their commitment to move the country towards green cars, we seek to analyze the current usage of demographics of cars in the state of California by focusing on vehicle fuel type by zip codes, as well as by auto maker. This will provide a sense of where California is at in terms of our path towards a greener state and room to create a roadmap in achieving our goal. On the other hand, auto makers can also use this service to identify where they are selling the most alternative vehicles and where they are selling less or none. By identifying this, auto makers can more efficiently and strategically deploy their advertising and incentive resources to achieve better results.
 
 ### Research Questions:
 
@@ -33,7 +33,7 @@ The report provides vehicle counts broken down by ZIP code, model year, fuel typ
 - Flask
 - Postgres
 
-### Fule Type Definitions:
+### Fuel Type Definitions:
 
 The following fuel types were used when counting vehicles registered per zip code in California. We focused our efforts on analyzing the alternative types.
 
@@ -48,8 +48,7 @@ The following fuel types were used when counting vehicles registered per zip cod
 > 'Hybrid Gasoline'
 > 'Other'
 > 'Gasoline'
-
-## 'Diesel and Diesel Hybrid'
+> 'Diesel and Diesel Hybrid'
 
 ### Conclusions / Final Analysis:
 
