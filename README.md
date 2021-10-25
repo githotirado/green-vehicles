@@ -3,12 +3,20 @@
 ### Teammates:
 
 Henry
+
 E
+
 Kacee Kira
+
+![1-Dash](images/GreenVehiclesDashboard.png)
 
 ### Purpose:
 
 With Biden’s administration voicing their commitment to move the country towards green cars, we seek to analyze the current usage of demographics of cars in the state of California by focusing on vehicle fuel type by zip codes, as well as by auto maker. This will provide a sense of where California is at in terms of our path towards a greener state and room to create a roadmap in achieving our goal. On the other hand, auto makers can also use this service to identify where they are selling the most alternative vehicles and where they are selling less or none. By identifying this, auto makers can more efficiently and strategically deploy their advertising and incentive resources to achieve better results.
+
+### Dashboard Operation:
+Begin by running the app.py Flask app. 
+Select the fuel types and then the auto maker from both the 'fuel types' and 'make' drop down menus in order to see all three panels populated.
 
 ### Research Questions:
 
