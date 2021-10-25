@@ -2,21 +2,95 @@
 //  Uses database object and geoJSON object
 function drawMap(mapData, carMake, dbMakeData, drawChoropleth) {
 
-  // Re-create the map object if it already existed
+  // Define variables for our base tile layers.
+  var street = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  });
+
+  var topo = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, <a href="http://viewfinderpanoramas.org">SRTM</a> | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)'
+  });
+
+  var satellite = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+  });
+  
+  // Find top 10 zip codes for chosen car Make
+  var dbTop10 = [];
+  for (var j = 0; j < dbMakeData.length; j++) {
+    var localMake = dbMakeData[j].make;
+    var localSum  = dbMakeData[j].sum;
+    var localZip  = dbMakeData[j].zip_code;
+
+    // Append 10 NUMERIC zip codes to array dbTop10 for current car make
+    var topCount = 10;
+    if (localMake == carMake && !isNaN(parseInt(localZip)) && Object.keys(dbTop10).length < topCount) {
+      dbTop10.push(localZip);
+    }
+  };
+
+  // Define special violet marker
+  var violetIcon = new L.Icon({
+    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-violet.png',
+    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
+
+  // With top 10 zips, place markers using properties from geoJSON object
+  var top10Marks = [];
+  for (let i = 0; i < mapData["features"].length; i++) {
+    let mapProperty = mapData["features"][i]["properties"]
+    let currentZip = mapProperty["ZCTA5CE10"];
+
+    if (dbTop10.includes(currentZip)) {
+      var markerCount = mapProperty["vehiclecount"][carMake];
+      var markerLat = mapProperty["INTPTLAT10"];
+      var markerLon = mapProperty["INTPTLON10"];
+      // Add to array of top10 markers
+      top10Marks.push(
+        L.marker([markerLat, markerLon], {
+              title: "Top 10 Zip Codes by Vehicle Counts",
+              icon: violetIcon
+          }
+        ).bindPopup(`<h5>Zip Code: ${currentZip}</h5> <hr> <h6>Make: ${carMake}<br>Vehicles: ${markerCount}</h6>`)
+      );
+
+    }
+  }
+
+  // Create overlay layer using the top10Marks array as layer group
+  var top10Layer = L.layerGroup(top10Marks);
+
+  // Our set of base maps
+  var baseMaps = {
+    Street: street,
+    // Topography: topo,
+    Satellite: satellite
+  };
+
+  // Define overlayMaps (toggle on/off)
+  var overlayMaps = {
+    Top10byCount: top10Layer
+  };
+
+
+  // Re-create the map object if it already existed, default layers
   if (myMap) myMap.remove();
   myMap = L.map("map", {
     center: [34.0522, -118.2437],
-    zoom: 9
+    zoom: 9,
+    layers: [street, top10Layer]
   });
 
-  // Add the tile layer
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-  }).addTo(myMap);
+  // Pass our map layers into our layer control.  Add to map.
+  L.control.layers(baseMaps, overlayMaps).addTo(myMap);
 
   var geojson;
 
-  // If car make is in db object, place choropleth layer
+  // If car make is in db object, add choropleth layer
   if (drawChoropleth == "yes") {
     // Create a new choropleth layer
     geojson = L.choropleth(mapData, {
@@ -88,36 +162,6 @@ function drawMap(mapData, carMake, dbMakeData, drawChoropleth) {
     // Add the legend to the map
     legend.addTo(myMap);
 
-    // Find top 10 zip codes for chosen car Make
-    var dbTop10 = [];
-    for (var j = 0; j < dbMakeData.length; j++) {
-      var localMake = dbMakeData[j].make;
-      var localSum  = dbMakeData[j].sum;
-      var localZip  = dbMakeData[j].zip_code;
-
-      // Append 10 NUMERIC zip codes to array dbTop10 for current car make
-      var topCount = 10;
-      if (localMake == carMake && !isNaN(parseInt(localZip)) && Object.keys(dbTop10).length < topCount) {
-        dbTop10.push(localZip);
-      }
-    };
-
-    // With top 10 zips, place markers using properties from geoJSON object
-    for (let i = 0; i < mapData["features"].length; i++) {
-      let mapProperty = mapData["features"][i]["properties"]
-      let currentZip = mapProperty["ZCTA5CE10"];
-
-      if (dbTop10.includes(currentZip)) {
-        var markerCount = mapProperty["vehiclecount"][carMake];
-        var markerLat = mapProperty["INTPTLAT10"];
-        var markerLon = mapProperty["INTPTLON10"];
-        // console.log(`Top10: ${carMake}, ${currentZip}, count ${markerCount}, coord ${markerLat}, ${markerLon}`);
-        var marker = L.marker([markerLat, markerLon], {
-          title: currentZip
-        }).addTo(myMap);
-        marker.bindPopup(`<h3>${currentZip}</h3> <hr> <h4>${carMake}: ${markerCount}</h4>`);
-      }
-    }
   }
 };
 
