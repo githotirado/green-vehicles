@@ -2,9 +2,9 @@
 
 ### Teammates:
 
-Henry
+Henry Tirado
 
-E
+Ehizogie
 
 Kacee Kira
 
@@ -40,6 +40,15 @@ The report provides vehicle counts broken down by ZIP code, model year, fuel typ
 - D3
 - Flask
 - Postgres
+
+### Database:
+A Postgres Database is deployed at AWS to store the vehicle registration data and a few other table views.  The schema used to create the main raw table as well as the additional views can be found in the /database/ folder of this repository (ex: /database/create_first_table_vehiclecount2020.sql).
+
+### Conceptual Visualization: Tableau Public
+A conceptual visualization of the look and functionality of the dashboard was created at Tableau Public: https://public.tableau.com/views/CAHybridandGreenVehicleDist20182020/PerformancebyCarMaker?:language=en-US&:display_count=n&:origin=viz_share_link
+
+### Deployment:
+The application is deployed at Heroku while the database is accessed at AWS.  The application can be reached at: https://ht-green-vehicles.herokuapp.com ; user gets a Choropleth map of vehicle count per ZIP code of green BMW vehicles.  Select the fuel types and a car make from the drop down menus to get the accompanying chart and table.
 
 ### Fuel Type Definitions:
 
