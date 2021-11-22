@@ -2,6 +2,7 @@ from flask import Flask, jsonify, render_template, request, redirect, url_for
 import pandas as pd 
 import json 
 import psycopg2
+import os
 
 #################################################
 # Flask Setup
@@ -13,7 +14,13 @@ app = Flask(__name__)
 #################################################
 
 from sqlalchemy import create_engine
-from config import username, password, host, port, database
+#### from config import username, password, host, port, database
+# Get database configuration variables from local OS variables
+username = os.environ.get('DBUSERNAME')
+password = os.environ.get('DBPASSWORD')
+host = os.environ.get('DBHOST')
+port = os.environ.get('DBPORT')
+database = os.environ.get('DBDATABASE')
 connection_string = f'{username}:{password}@{host}:{port}/{database}'
 engine = create_engine(f'postgresql://{connection_string}')
 

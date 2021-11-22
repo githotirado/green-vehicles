@@ -189,7 +189,7 @@ d3.json(geoData).then(function(data) {
 
   // Create a zip code object from the database containing all car makes and their
   // registered vehicle counts per zip code.  For later add to geoJSON properties
-  d3.json("http://127.0.0.1:5000/altbyzipmake").then(function(altbyzipmake) {
+  d3.json("/altbyzipmake").then(function(altbyzipmake) {
 
     // Initiate arrays to hold all possible car makes and zip codes in db
     var dbMakes = [];
